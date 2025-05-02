@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Geocode Lookup</title>
+    <!-- Bootstrap CSS for styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .container {
+            max-width: 800px;
+            margin-top: 30px;
+        }
+        .results-container {
+            margin-top: 20px;
+        }
+        .result-card {
+            margin-bottom: 15px;
+        }
+        .loading {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Our React App -->
+    <script type="text/babel">
+        const { useState } = React;
+        
+        function App() {
+            const [address, setAddress] = useState('');
+            const [results, setResults] = useState(null);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState(null);
+            
+            // You'll need to replace this with your actual Google Maps API key
+            const apiKey = 'AIzaSyClSdztRAcx5_O7LSuuJEuWsNP9JZgkFKQ';
+            
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                
+                if (!address.trim()) {
+                    setError('Please enter an address');
+                    return;
+                }
+                
+                if (!apiKey) {
+                    setError('Please add your Google Maps API key in the code');
+                    return;
+                }
+                
+                setLoading(true);
+                setError(null);
+                
+                try {
+                    const encodedAddress = encodeURIComponent(address);
+                    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`;
+                    
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if (data.status === 'OK') {
+                        setResults(data.results);
+                    } else {
+                        setError(`Error: ${data.status}${data.error_message ? ' - ' + data.error_message : ''}`);
+                    }
+                } catch (err) {
+                    setError(`Error: ${err.message}`);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            
+            return (
+                <div className="container">
+                    <div className="card">
+                        <div className="card-header bg-primary text-white">
+                            <h1 className="h3 mb-0">Address Geocode Lookup</h1>
+                        </div>
+                        <div className="card-body">
+                            <form onSubmit={handleSubmit}>
+                                <div className="mb-3">
+                                    <label htmlFor="address" className="form-label">Enter an address:</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control" 
+                                        id="address" 
+                                        value={address} 
+                                        onChange={(e) => setAddress(e.target.value)} 
+                                        placeholder="e.g. 1600 Amphitheatre Parkway, Mountain View, CA"
+                                    />
+                                </div>
+                                <button type="submit" className="btn btn-primary" disabled={loading}>
+                                    {loading ? 'Searching...' : 'Lookup Address'}
+                                </button>
+                            </form>
+                            
+                            {error && (
+                                <div className="alert alert-danger mt-3">
+                                    {error}
+                                </div>
+                            )}
+                            
+                            {loading && (
+                                <div className="loading">
+                                    <div className="spinner-border text-primary" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {results && results.length > 0 && (
+                                <div className="results-container">
+                                    <h2 className="h4 mb-3">Results:</h2>
+                                    {results.map((result, index) => (
+                                        <div key={index} className="card result-card">
+                                            <div className="card-body">
+                                                <h3 className="h5 card-title">Result {index + 1}</h3>
+                                                <p><strong>Formatted Address:</strong> {result.formatted_address}</p>
+                                                <p><strong>Location (Lat, Lng):</strong> {result.geometry.location.lat}, {result.geometry.location.lng}</p>
+                                                <p><strong>Place ID:</strong> {result.place_id}</p>
+                                                <p><strong>Types:</strong> {result.types.join(', ')}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="mt-3 text-muted small">
+                        <p>Note: To use this application, you need to add your Google Maps API key in the code.</p>
+                        <p>You can get an API key from the <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> by enabling the Geocoding API.</p>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Render the App component
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

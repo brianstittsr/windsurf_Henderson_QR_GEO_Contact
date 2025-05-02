@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Henderson Location</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            background-color: #4285F4;
+            color: white;
+            padding: 1.5rem 0;
+        }
+        .main-content {
+            flex: 1;
+            padding: 2rem 0;
+        }
+        .footer {
+            margin-top: auto;
+            padding: 1.5rem 0;
+            background-color: #f1f3f4;
+        }
+        .back-link {
+            color: #4285F4;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .form-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-section h3 {
+            color: #4285F4;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .preview-section {
+            margin-top: 2rem;
+            display: none;
+        }
+        #previewMap {
+            height: 300px;
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        #qrCodePreview {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+        .success-message {
+            display: none;
+            margin-top: 2rem;
+        }
+        .loading-spinner {
+            display: none;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+        .required-field::after {
+            content: " *";
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="text-center"><i class="fas fa-plus-circle me-2"></i> Add New Henderson Location</h1>
+        </div>
+    </header>
+    
+    <main class="container main-content">
+        <a href="dashboard.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        
+        <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i>
+            Fill out this form to add a new location in Henderson, NC. The system will geocode the address, generate a QR code, and add it to the database.
+        </div>
+        
+        <div id="loadingSpinner" class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <span class="ms-2">Processing your request...</span>
+        </div>
+        
+        <div id="successMessage" class="alert alert-success success-message">
+            <i class="fas fa-check-circle me-2"></i>
+            <span id="successText">Location added successfully!</span>
+            <div class="mt-3">
+                <a href="henderson_geocode.html" class="btn btn-primary btn-sm me-2">
+                    <i class="fas fa-map-marked-alt me-1"></i> View on Map
+                </a>
+                <a href="QR_Codes.html" class="btn btn-primary btn-sm">
+                    <i class="fas fa-qrcode me-1"></i> View QR Codes
+                </a>
+            </div>
+        </div>
+        
+        <form id="locationForm">
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <h3>Basic Information</h3>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="facilityName" class="form-label required-field">Facility Name</label>
+                        <input type="text" class="form-control" id="facilityName" required>
+                        <div class="form-text">The name of the facility or location</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="category" class="form-label required-field">Category</label>
+                        <select class="form-select" id="category" required>
+                            <option value="" selected disabled>Select a category</option>
+                            <option value="Government">Government</option>
+                            <option value="Education">Education</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Recreation">Recreation</option>
+                            <option value="Historic">Historic</option>
+                            <option value="Commercial">Commercial</option>
+                            <option value="Restaurant">Restaurant</option>
+                            <option value="Accommodation">Accommodation</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div class="form-text">The type of facility</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Address Section -->
+            <div class="form-section">
+                <h3>Address Information</h3>
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label for="address" class="form-label required-field">Full Address</label>
+                        <input type="text" class="form-control" id="address" required placeholder="e.g. 134 Rose Ave, Henderson, NC 27536">
+                        <div class="form-text">Enter the complete address including street, city, state, and zip code</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Historical Information Section -->
+            <div class="form-section">
+                <h3>Historical Information</h3>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="yearBuilt" class="form-label">Year Built</label>
+                        <input type="number" class="form-control" id="yearBuilt" min="1700" max="2025">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="architecturalStyle" class="form-label">Architectural Style</label>
+                        <input type="text" class="form-control" id="architecturalStyle">
+                    </div>
+                    <div class="col-12">
+                        <label for="historicalSignificance" class="form-label">Historical Significance</label>
+                        <textarea class="form-control" id="historicalSignificance" rows="3"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="currentStatus" class="form-label">Current Status</label>
+                        <input type="text" class="form-control" id="currentStatus">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Details Section -->
+            <div class="form-section">
+                <h3>Additional Details</h3>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" placeholder="e.g. (252) 123-4567">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="website" class="form-label">Website</label>
+                        <input type="url" class="form-control" id="website" placeholder="e.g. https://example.com">
+                    </div>
+                    <div class="col-12">
+                        <label for="hours" class="form-label">Operating Hours</label>
+                        <input type="text" class="form-control" id="hours" placeholder="e.g. Monday-Friday: 9:00 AM - 5:00 PM">
+                    </div>
+                    <div class="col-12">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Wikipedia Information Section -->
+            <div class="form-section">
+                <h3>Wikipedia Information</h3>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label for="buildingContext" class="form-label">Building Context</label>
+                        <textarea class="form-control" id="buildingContext" rows="3"></textarea>
+                        <div class="form-text">Information about the building's historical or cultural context</div>
+                    </div>
+                    <div class="col-12">
+                        <label for="architectInfo" class="form-label">Architect Information</label>
+                        <textarea class="form-control" id="architectInfo" rows="3"></textarea>
+                        <div class="form-text">Information about the architect(s) who designed the building</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+                <button type="button" class="btn btn-secondary me-md-2" id="previewButton">
+                    <i class="fas fa-eye me-1"></i> Preview
+                </button>
+                <button type="submit" class="btn btn-primary" id="submitButton">
+                    <i class="fas fa-save me-1"></i> Save Location
+                </button>
+            </div>
+        </form>
+        
+        <!-- Preview Section -->
+        <div id="previewSection" class="preview-section">
+            <div class="form-section">
+                <h3>Location Preview</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="previewMap"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title" id="previewTitle">Facility Name</h5>
+                                <p class="card-text" id="previewAddress">Address</p>
+                                <p class="card-text"><strong>Category:</strong> <span id="previewCategory">Category</span></p>
+                                <p class="card-text"><strong>Coordinates:</strong> <span id="previewCoordinates">Coordinates</span></p>
+                                <div id="qrCodePreview"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0">
+                Henderson Geocode Project | <a href="https://developers.google.com/maps/documentation" target="_blank">Google Maps API Documentation</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    
+    <script>
+        // Global variables
+        let map;
+        let marker;
+        let geocoder;
+        let qrCode;
+        let previewData = {};
+        
+        // Initialize the map
+        function initMap() {
+            // Default center on Henderson, NC
+            const henderson = { lat: 36.3296, lng: -78.4186 };
+            
+            // Initialize geocoder
+            geocoder = new google.maps.Geocoder();
+            
+            // Create map centered on Henderson
+            map = new google.maps.Map(document.getElementById("previewMap"), {
+                center: henderson,
+                zoom: 13,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true,
+            });
+            
+            // Create a marker that can be repositioned
+            marker = new google.maps.Marker({
+                position: henderson,
+                map: map,
+                draggable: true,
+                animation: google.maps.Animation.DROP
+            });
+            
+            // Update coordinates when marker is dragged
+            marker.addListener('dragend', function() {
+                const position = marker.getPosition();
+                document.getElementById('previewCoordinates').textContent = `${position.lat().toFixed(6)}, ${position.lng().toFixed(6)}`;
+                previewData.geometry = {
+                    location: {
+                        lat: position.lat(),
+                        lng: position.lng()
+                    }
+                };
+            });
+        }
+        
+        // Function to geocode address
+        function geocodeAddress(address) {
+            return new Promise((resolve, reject) => {
+                geocoder.geocode({ address: address }, (results, status) => {
+                    if (status === "OK") {
+                        resolve(results[0]);
+                    } else {
+                        reject(new Error(`Geocoding failed: ${status}`));
+                    }
+                });
+            });
+        }
+        
+        // Function to generate QR code
+        function generateQRCode(url) {
+            // Clear any existing QR code
+            const qrElement = document.getElementById('qrCodePreview');
+            qrElement.innerHTML = '';
+            
+            // Create absolute URL
+            const absoluteUrl = new URL(url, window.location.href).href;
+            
+            // Create QR code
+            qrCode = new QRCode(qrElement, {
+                text: absoluteUrl,
+                width: 150,
+                height: 150,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+        
+        // Function to preview location
+        async function previewLocation() {
+            const facilityName = document.getElementById('facilityName').value;
+            const address = document.getElementById('address').value;
+            const category = document.getElementById('category').value;
+            
+            if (!facilityName || !address || !category) {
+                alert('Please fill in all required fields (Facility Name, Category, and Address)');
+                return;
+            }
+            
+            try {
+                // Show loading spinner
+                document.getElementById('loadingSpinner').style.display = 'flex';
+                
+                // Geocode the address
+                const result = await geocodeAddress(address);
+                
+                // Update preview data
+                previewData = {
+                    facility_name: facilityName,
+                    formatted_address: result.formatted_address,
+                    geometry: {
+                        location: {
+                            lat: result.geometry.location.lat(),
+                            lng: result.geometry.location.lng()
+                        }
+                    },
+                    place_id: result.place_id,
+                    types: [category.toLowerCase()],
+                };
+                
+                // Add historical info if provided
+                const yearBuilt = document.getElementById('yearBuilt').value;
+                const architecturalStyle = document.getElementById('architecturalStyle').value;
+                const historicalSignificance = document.getElementById('historicalSignificance').value;
+                const currentStatus = document.getElementById('currentStatus').value;
+                
+                if (yearBuilt || architecturalStyle || historicalSignificance || currentStatus) {
+                    previewData.historical_info = {
+                        year_built: yearBuilt || "",
+                        architectural_style: architecturalStyle || "",
+                        historical_significance: historicalSignificance || "",
+                        current_status: currentStatus || ""
+                    };
+                }
+                
+                // Add details if provided
+                const phone = document.getElementById('phone').value;
+                const website = document.getElementById('website').value;
+                const hours = document.getElementById('hours').value;
+                const description = document.getElementById('description').value;
+                
+                if (phone || website || hours || description) {
+                    previewData.details = {
+                        phone: phone || "",
+                        website: website || "",
+                        hours: hours || "",
+                        description: description || ""
+                    };
+                }
+                
+                // Add Wikipedia info if provided
+                const buildingContext = document.getElementById('buildingContext').value;
+                const architectInfo = document.getElementById('architectInfo').value;
+                
+                if (buildingContext || architectInfo) {
+                    previewData.wikipedia_info = {
+                        building_context: buildingContext || "",
+                        architects: {
+                            info: architectInfo || ""
+                        }
+                    };
+                }
+                
+                // Update preview UI
+                document.getElementById('previewTitle').textContent = facilityName;
+                document.getElementById('previewAddress').textContent = result.formatted_address;
+                document.getElementById('previewCategory').textContent = category;
+                document.getElementById('previewCoordinates').textContent = 
+                    `${result.geometry.location.lat().toFixed(6)}, ${result.geometry.location.lng().toFixed(6)}`;
+                
+                // Update map and marker
+                map.setCenter(result.geometry.location);
+                map.setZoom(16);
+                marker.setPosition(result.geometry.location);
+                
+                // Generate QR code for the location
+                const detailUrl = `facility_detail.html?id=${result.place_id}`;
+                generateQRCode(detailUrl);
+                
+                // Show preview section
+                document.getElementById('previewSection').style.display = 'block';
+                
+                // Scroll to preview section
+                document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+                console.error(error);
+            } finally {
+                // Hide loading spinner
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        }
+        
+        // Function to save location
+        async function saveLocation(event) {
+            event.preventDefault();
+            
+            // Check if preview has been generated
+            if (!previewData.place_id) {
+                alert('Please preview the location before saving');
+                return;
+            }
+            
+            try {
+                // Show loading spinner
+                document.getElementById('loadingSpinner').style.display = 'flex';
+                
+                // Fetch existing data
+                const response = await fetch('data.json');
+                const data = await response.json();
+                
+                // Check if location already exists
+                if (data.results && data.results.some(item => item.place_id === previewData.place_id)) {
+                    alert('This location already exists in the database');
+                    return;
+                }
+                
+                // Add new location to data
+                if (!data.results) {
+                    data.results = [];
+                }
+                data.results.push(previewData);
+                
+                // In a real application, we would save the data to the server here
+                // For this demo, we'll just show a success message
+                console.log('New location data:', previewData);
+                console.log('Updated data.json:', data);
+                
+                // Show success message
+                document.getElementById('successText').textContent = 
+                    `Location "${previewData.facility_name}" added successfully!`;
+                document.getElementById('successMessage').style.display = 'block';
+                
+                // Scroll to success message
+                document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+                
+                // Reset form
+                document.getElementById('locationForm').reset();
+                document.getElementById('previewSection').style.display = 'none';
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+                console.error(error);
+            } finally {
+                // Hide loading spinner
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Preview button click
+            document.getElementById('previewButton').addEventListener('click', previewLocation);
+            
+            // Form submission
+            document.getElementById('locationForm').addEventListener('submit', saveLocation);
+        });
+    </script>
+    
+    <!-- Google Maps JavaScript API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClSdztRAcx5_O7LSuuJEuWsNP9JZgkFKQ&callback=initMap" async defer></script>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

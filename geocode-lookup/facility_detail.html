@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facility Detail</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            background-color: #4285F4;
+            color: white;
+            padding: 1.5rem 0;
+        }
+        .main-content {
+            flex: 1;
+            padding: 2rem 0;
+        }
+        .facility-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .info-section {
+            margin-bottom: 2rem;
+        }
+        .info-section h3 {
+            color: #4285F4;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 0.5rem;
+        }
+        .footer {
+            margin-top: auto;
+            padding: 1.5rem 0;
+            background-color: #f1f3f4;
+        }
+        .back-link {
+            color: #4285F4;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .architect-card {
+            margin-bottom: 1rem;
+        }
+        #facilityMap {
+            height: 300px;
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="text-center" id="facilityTitle">Facility Detail</h1>
+        </div>
+    </header>
+    
+    <main class="container main-content">
+        <a href="henderson_geocode.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Map
+        </a>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Facility Information Section -->
+                <div class="info-section">
+                    <h3>About the Facility</h3>
+                    <p id="facilityAddress" class="mb-2"></p>
+                    <p id="facilityCoordinates" class="mb-2"></p>
+                    <div id="facilityTypes" class="mb-3"></div>
+                    
+                    <div id="historicalInfo">
+                        <!-- Historical information will be inserted here -->
+                    </div>
+                </div>
+                
+                <!-- Wikipedia Information Section -->
+                <div class="info-section">
+                    <h3>Wikipedia Information</h3>
+                    <div id="wikipediaInfo">
+                        <!-- Wikipedia information will be inserted here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <!-- Map Section -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Location</h5>
+                        <div id="facilityMap"></div>
+                    </div>
+                </div>
+                
+                <!-- Additional Information -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Recent Developments</h5>
+                        <div id="recentDevelopments">
+                            <!-- Recent developments will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0">
+                Powered by Google Maps Platform | <a href="https://developers.google.com/maps/documentation" target="_blank">Google Maps API Documentation</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Function to get URL parameters
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            const results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+        
+        // Function to load facility data
+        function loadFacilityData() {
+            const facilityId = getUrlParameter('id');
+            
+            if (!facilityId) {
+                document.getElementById('facilityTitle').textContent = 'Facility Not Found';
+                return;
+            }
+            
+            fetch('data.json')
+                .then(response => response.json())
+                .then(data => {
+                    // Find the facility with the matching ID
+                    const facility = data.results.find(item => item.place_id === facilityId);
+                    
+                    if (!facility) {
+                        document.getElementById('facilityTitle').textContent = 'Facility Not Found';
+                        return;
+                    }
+                    
+                    // Update the page title
+                    document.getElementById('facilityTitle').textContent = facility.facility_name || 'Facility Detail';
+                    document.title = facility.facility_name || 'Facility Detail';
+                    
+                    // Update basic information
+                    document.getElementById('facilityAddress').innerHTML = `<strong>Address:</strong> ${facility.formatted_address}`;
+                    document.getElementById('facilityCoordinates').innerHTML = `<strong>Coordinates:</strong> ${facility.geometry.location.lat.toFixed(6)}, ${facility.geometry.location.lng.toFixed(6)}`;
+                    
+                    // Update facility types
+                    if (facility.types && facility.types.length > 0) {
+                        const typesHtml = facility.types.map(type => 
+                            `<span class="badge bg-secondary me-1">${type}</span>`
+                        ).join('');
+                        document.getElementById('facilityTypes').innerHTML = `<strong>Types:</strong> ${typesHtml}`;
+                    }
+                    
+                    // Update historical information
+                    if (facility.historical_info) {
+                        const histInfo = facility.historical_info;
+                        let histHtml = `
+                            <h4>Historical Information</h4>
+                            <p><strong>Year Built:</strong> ${histInfo.year_built}</p>
+                            <p><strong>Architectural Style:</strong> ${histInfo.architectural_style}</p>
+                            <p><strong>Historical Significance:</strong> ${histInfo.historical_significance}</p>
+                            <p><strong>Current Status:</strong> ${histInfo.current_status}</p>
+                        `;
+                        
+                        // Add architects information
+                        if (histInfo.architects && histInfo.architects.length > 0) {
+                            histHtml += `<h5 class="mt-3">Architects</h5>`;
+                            histInfo.architects.forEach(architect => {
+                                histHtml += `
+                                    <div class="card architect-card">
+                                        <div class="card-body">
+                                            <h6 class="card-title">${architect.name}</h6>
+                                            <p class="card-text"><strong>Lifespan:</strong> ${architect.lifespan}</p>
+                                            ${architect.firm ? `<p class="card-text"><strong>Firm:</strong> ${architect.firm}</p>` : ''}
+                                            ${architect.role ? `<p class="card-text"><strong>Role:</strong> ${architect.role}</p>` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        }
+                        
+                        // Add inventories information
+                        if (histInfo.listed_in_inventories && histInfo.listed_in_inventories.length > 0) {
+                            histHtml += `
+                                <h5 class="mt-3">Listed In</h5>
+                                <ul>
+                                    ${histInfo.listed_in_inventories.map(inv => `<li>${inv}</li>`).join('')}
+                                </ul>
+                            `;
+                        }
+                        
+                        document.getElementById('historicalInfo').innerHTML = histHtml;
+                    }
+                    
+                    // Update recent developments
+                    if (facility.historical_info && facility.historical_info.recent_developments) {
+                        const dev = facility.historical_info.recent_developments;
+                        document.getElementById('recentDevelopments').innerHTML = `
+                            <p><strong>Date:</strong> ${dev.date}</p>
+                            <p>${dev.note}</p>
+                        `;
+                    }
+                    
+                    // Update Wikipedia information
+                    if (facility.wikipedia_info) {
+                        const wiki = facility.wikipedia_info;
+                        let wikiHtml = '';
+                        
+                        // Add architects information
+                        if (wiki.architects) {
+                            wikiHtml += `<h4>About the Architects</h4>`;
+                            for (const [key, value] of Object.entries(wiki.architects)) {
+                                wikiHtml += `<p>${value}</p>`;
+                            }
+                        }
+                        
+                        // Add building context
+                        if (wiki.building_context) {
+                            wikiHtml += `
+                                <h4 class="mt-4">Building Context</h4>
+                                <p>${wiki.building_context}</p>
+                            `;
+                        }
+                        
+                        document.getElementById('wikipediaInfo').innerHTML = wikiHtml;
+                    }
+                    
+                    // Initialize the map
+                    initMap(facility.geometry.location);
+                })
+                .catch(error => {
+                    console.error('Error loading data:', error);
+                    document.getElementById('facilityTitle').textContent = 'Error Loading Facility Data';
+                });
+        }
+        
+        // Initialize the map
+        function initMap(location) {
+            const map = new google.maps.Map(document.getElementById('facilityMap'), {
+                center: location,
+                zoom: 16,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
+            });
+            
+            // Add a marker for the facility
+            const marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                animation: google.maps.Animation.DROP
+            });
+        }
+        
+        // Load facility data when the page loads
+        document.addEventListener('DOMContentLoaded', loadFacilityData);
+    </script>
+    
+    <!-- Load the Google Maps JavaScript API with your API key -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClSdztRAcx5_O7LSuuJEuWsNP9JZgkFKQ&callback=initMap" async defer></script>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

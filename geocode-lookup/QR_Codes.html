@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Henderson QR Codes</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QR Code Library - Using QRCode.js which is more reliable for mobile scanning -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            background-color: #4285F4;
+            color: white;
+            padding: 1.5rem 0;
+        }
+        .main-content {
+            flex: 1;
+            padding: 2rem 0;
+        }
+        .footer {
+            margin-top: auto;
+            padding: 1.5rem 0;
+            background-color: #f1f3f4;
+        }
+        .back-link {
+            color: #4285F4;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .qr-card {
+            height: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .qr-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .qr-code-container {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .qr-title {
+            color: #4285F4;
+            text-decoration: none;
+        }
+        .qr-title:hover {
+            text-decoration: underline;
+        }
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        .qr-address {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .download-btn {
+            margin-top: 0.5rem;
+        }
+        #noDataAlert {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="text-center"><i class="fas fa-qrcode me-2"></i> Henderson QR Codes</h1>
+        </div>
+    </header>
+    
+    <main class="container main-content">
+        <a href="dashboard.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        
+        <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i>
+            Scan these QR codes with your mobile device to access detailed information about Henderson locations.
+        </div>
+        
+        <div class="alert alert-danger" id="noDataAlert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            No data found. Please make sure the data.json file contains valid entries.
+        </div>
+        
+        <div id="loadingSpinner" class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="qrCodesContainer">
+            <!-- QR codes will be dynamically inserted here -->
+        </div>
+    </main>
+    
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0">
+                Henderson Geocode Project | <a href="https://developers.google.com/maps/documentation" target="_blank">Google Maps API Documentation</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQRCodes();
+        });
+        
+        function loadQRCodes() {
+            fetch('data.json')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('qrCodesContainer');
+                    const loadingSpinner = document.getElementById('loadingSpinner');
+                    
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+                    
+                    // Check if data has results property
+                    if (data.results && data.results.length > 0) {
+                        // Generate QR code for each place
+                        data.results.forEach(place => {
+                            createQRCodeCard(place, container);
+                        });
+                    } else {
+                        // Show no data alert
+                        document.getElementById('noDataAlert').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading data:', error);
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    document.getElementById('noDataAlert').style.display = 'block';
+                });
+        }
+        
+        function createQRCodeCard(place, container) {
+            // Create a unique ID for the QR code
+            const qrId = `qr-${place.place_id.replace(/[^a-zA-Z0-9]/g, '')}`;
+            
+            // Create the detail page URL with absolute path to ensure it works when scanned
+            // Get the base URL of the current page (without the filename)
+            const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+            const detailUrl = `${baseUrl}facility_detail.html?id=${place.place_id}`;
+            
+            // Create card element
+            const cardCol = document.createElement('div');
+            cardCol.className = 'col';
+            
+            // Get facility name or use formatted address as fallback
+            const facilityName = place.facility_name || place.formatted_address;
+            
+            cardCol.innerHTML = `
+                <div class="card qr-card">
+                    <div class="qr-code-container">
+                        <div id="${qrId}"></div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="${detailUrl}" class="qr-title" target="_blank">${facilityName}</a>
+                        </h5>
+                        <p class="card-text qr-address">${place.formatted_address}</p>
+                        <a href="${detailUrl}" class="btn btn-primary btn-sm" target="_blank">
+                            <i class="fas fa-info-circle me-1"></i> View Details
+                        </a>
+                        <button class="btn btn-outline-secondary btn-sm download-btn" onclick="downloadQRCode('${qrId}', '${facilityName.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-download me-1"></i> Download QR
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Add card to container
+            container.appendChild(cardCol);
+            
+            // Generate QR code
+            generateQRCode(qrId, detailUrl);
+        }
+        
+        function generateQRCode(elementId, url) {
+            // Clear any existing content
+            const element = document.getElementById(elementId);
+            element.innerHTML = '';
+            
+            // Create absolute URL to ensure it works when scanned
+            const absoluteUrl = new URL(url, window.location.href).href;
+            
+            // Create QR code with more options for better scanning
+            new QRCode(element, {
+                text: absoluteUrl,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H // High error correction level
+            });
+        }
+        
+        function downloadQRCode(qrId, facilityName) {
+            // Get the QR code canvas
+            const qrCanvas = document.querySelector(`#${qrId} canvas`);
+            
+            if (!qrCanvas) {
+                alert('QR code image not found');
+                return;
+            }
+            
+            // Convert canvas to data URL
+            const dataURL = qrCanvas.toDataURL('image/png');
+            
+            // Create a temporary link element
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = `QR_Code_${facilityName.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
