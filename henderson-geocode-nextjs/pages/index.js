@@ -29,12 +29,8 @@ export default function Home() {
             <Link href="/add-location" className="tool-link">
               <FontAwesomeIcon icon={faPlusCircle} /> Add New Henderson Location
             </Link>
-            <Link href="/contacts-list" className="tool-link">
-              <FontAwesomeIcon icon={faAddressBook} /> Contact List
-            </Link>
-            <Link href="/qr-contact" className="tool-link">
-              <FontAwesomeIcon icon={faAddressCard} /> Create Contact QR Code
-            </Link>
+            {/* Contact List button hidden per request */}
+            {/* Create Contact QR Code button hidden per request */}
           </div>
         </div>
       </div>
