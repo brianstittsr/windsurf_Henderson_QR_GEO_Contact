@@ -11,7 +11,10 @@ import {
   faLeaf,
   faSolarPanel,
   faCity,
-  faWifi
+  faWifi,
+  faLandmark,
+  faVrCardboard,
+  faHistory
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function PlatformDashboard() {
@@ -248,6 +251,48 @@ export default function PlatformDashboard() {
                     <div>
                       <button className="btn btn-sm btn-outline-secondary me-2" disabled>Settings</button>
                       <button className="btn btn-sm btn-outline-secondary" disabled>Analytics</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="col-md-6 mb-4">
+                <div className="card h-100 shadow-sm bg-light border border-2 border-info border-opacity-25">
+                  <div className="position-absolute top-0 end-0 m-2">
+                    <span className="badge bg-info text-white">Featured</span>
+                  </div>
+                  <div className="card-body">
+                    <div className="d-flex align-items-center mb-3">
+                      <div className="app-icon me-3 bg-info text-white">
+                        <FontAwesomeIcon icon={faVrCardboard} />
+                      </div>
+                      <h5 className="card-title mb-0">Holographic Heritage Virtual Tour</h5>
+                    </div>
+                    <p className="card-text">Dr. Aal-Anubia's innovative platform for preserving Henderson's history through 2D/3D virtual environments, QR-accessible historical narratives, and geocoded landmarks.</p>
+                    <div className="d-flex align-items-center small text-muted">
+                      <span className="me-3">Coming Q3 2025</span>
+                      <span>Status: <span className="text-info">In Development</span></span>
+                    </div>
+                    <div className="mt-3">
+                      <div className="d-flex align-items-center mb-2">
+                        <FontAwesomeIcon icon={faHistory} className="text-info me-2" />
+                        <small className="text-muted">Preserve Henderson's History and Heroes</small>
+                      </div>
+                      <div className="d-flex align-items-center mb-2">
+                        <FontAwesomeIcon icon={faLandmark} className="text-info me-2" />
+                        <small className="text-muted">Geocoded Historical Landmarks</small>
+                      </div>
+                      <div className="d-flex align-items-center">
+                        <FontAwesomeIcon icon={faMapMarkedAlt} className="text-info me-2" />
+                        <small className="text-muted">Next-Gen Tourism Destination</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-footer bg-light border-top-0 d-flex justify-content-between">
+                    <button className="btn btn-info text-white" disabled>Coming Soon</button>
+                    <div>
+                      <button className="btn btn-sm btn-outline-info me-2" disabled>Preview</button>
+                      <button className="btn btn-sm btn-outline-secondary" disabled>Details</button>
                     </div>
                   </div>
                 </div>
