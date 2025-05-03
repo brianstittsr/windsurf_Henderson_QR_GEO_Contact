@@ -7,7 +7,11 @@ import {
   faChartLine, 
   faUsers, 
   faPlus,
-  faCog
+  faCog,
+  faLeaf,
+  faSolarPanel,
+  faCity,
+  faWifi
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function PlatformDashboard() {
@@ -137,6 +141,106 @@ export default function PlatformDashboard() {
                     <div className="d-flex align-items-center small text-muted">
                       <span className="me-3">Coming soon</span>
                       <span>Status: <span className="text-secondary">In Development</span></span>
+                    </div>
+                  </div>
+                  <div className="card-footer bg-light border-top-0 d-flex justify-content-between">
+                    <button className="btn btn-secondary" disabled>Coming Soon</button>
+                    <div>
+                      <button className="btn btn-sm btn-outline-secondary me-2" disabled>Settings</button>
+                      <button className="btn btn-sm btn-outline-secondary" disabled>Analytics</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-6 mb-4">
+                <div className="card h-100 shadow-sm bg-light">
+                  <div className="card-body">
+                    <div className="d-flex align-items-center mb-3">
+                      <div className="app-icon me-3 bg-success text-white">
+                        <FontAwesomeIcon icon={faLeaf} />
+                      </div>
+                      <h5 className="card-title mb-0">Community Chiller & Boiler Systems</h5>
+                    </div>
+                    <p className="card-text">Implement shared community chillers and boilers to cut energy costs by more than half, reduce maintenance, and increase reliability.</p>
+                    <div className="d-flex align-items-center small text-muted">
+                      <span className="me-3">Coming Q3 2025</span>
+                      <span>Status: <span className="text-secondary">Planned</span></span>
+                    </div>
+                  </div>
+                  <div className="card-footer bg-light border-top-0 d-flex justify-content-between">
+                    <button className="btn btn-secondary" disabled>Coming Soon</button>
+                    <div>
+                      <button className="btn btn-sm btn-outline-secondary me-2" disabled>Settings</button>
+                      <button className="btn btn-sm btn-outline-secondary" disabled>Analytics</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-6 mb-4">
+                <div className="card h-100 shadow-sm bg-light">
+                  <div className="card-body">
+                    <div className="d-flex align-items-center mb-3">
+                      <div className="app-icon me-3 bg-warning text-white">
+                        <FontAwesomeIcon icon={faSolarPanel} />
+                      </div>
+                      <h5 className="card-title mb-0">On-Demand, Renewable Energy</h5>
+                    </div>
+                    <p className="card-text">Shift to energy-on-demand, solar, and battery storage to regulate usage, decrease costs, and sell excess energy back to the grid.</p>
+                    <div className="d-flex align-items-center small text-muted">
+                      <span className="me-3">Coming Q4 2025</span>
+                      <span>Status: <span className="text-secondary">Planned</span></span>
+                    </div>
+                  </div>
+                  <div className="card-footer bg-light border-top-0 d-flex justify-content-between">
+                    <button className="btn btn-secondary" disabled>Coming Soon</button>
+                    <div>
+                      <button className="btn btn-sm btn-outline-secondary me-2" disabled>Settings</button>
+                      <button className="btn btn-sm btn-outline-secondary" disabled>Analytics</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-6 mb-4">
+                <div className="card h-100 shadow-sm bg-light">
+                  <div className="card-body">
+                    <div className="d-flex align-items-center mb-3">
+                      <div className="app-icon me-3 bg-info text-white">
+                        <FontAwesomeIcon icon={faCity} />
+                      </div>
+                      <h5 className="card-title mb-0">Multi-Purpose, People-Centered Downtown</h5>
+                    </div>
+                    <p className="card-text">Reimagine downtown as a tech-forward, pedestrian-friendly hub with underused rooftops as green spaces or gathering areas.</p>
+                    <div className="d-flex align-items-center small text-muted">
+                      <span className="me-3">Coming Q1 2026</span>
+                      <span>Status: <span className="text-secondary">Planned</span></span>
+                    </div>
+                  </div>
+                  <div className="card-footer bg-light border-top-0 d-flex justify-content-between">
+                    <button className="btn btn-secondary" disabled>Coming Soon</button>
+                    <div>
+                      <button className="btn btn-sm btn-outline-secondary me-2" disabled>Settings</button>
+                      <button className="btn btn-sm btn-outline-secondary" disabled>Analytics</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-6 mb-4">
+                <div className="card h-100 shadow-sm bg-light">
+                  <div className="card-body">
+                    <div className="d-flex align-items-center mb-3">
+                      <div className="app-icon me-3 bg-primary text-white">
+                        <FontAwesomeIcon icon={faWifi} />
+                      </div>
+                      <h5 className="card-title mb-0">Smart City Connectivity</h5>
+                    </div>
+                    <p className="card-text">Use smart city technology to connect buildings, parks, and public spaces to tell the stories of Henderson's people and history.</p>
+                    <div className="d-flex align-items-center small text-muted">
+                      <span className="me-3">Coming Q2 2026</span>
+                      <span>Status: <span className="text-secondary">Planned</span></span>
                     </div>
                   </div>
                   <div className="card-footer bg-light border-top-0 d-flex justify-content-between">
