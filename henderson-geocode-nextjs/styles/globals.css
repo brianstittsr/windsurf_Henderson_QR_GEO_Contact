@@ -1,10 +1,15 @@
 :root {
-  --primary-color: #4285F4;
+  --primary-color: #3a86ff;
   --secondary-color: #34a853;
   --danger-color: #ea4335;
   --warning-color: #fbbc05;
   --light-color: #f8f9fa;
   --dark-color: #212529;
+  --info-color: #4cc9f0;
+  --success-color: #38b000;
+  --border-radius: 8px;
+  --card-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  --card-shadow-hover: 0 12px 20px rgba(0,0,0,0.1);
 }
 
 html,
@@ -29,6 +34,7 @@ a {
   background-color: var(--primary-color);
   color: white;
   padding: 1.5rem 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .footer {
@@ -67,17 +73,36 @@ a {
   background-color: var(--primary-color);
   color: white;
   text-decoration: none;
-  border-radius: 5px;
-  transition: background-color 0.3s;
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+  box-shadow: var(--card-shadow);
 }
 
 .tool-link:hover {
-  background-color: #3367D6;
+  background-color: #2a75ef;
   color: white;
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-3px);
 }
 
 .tool-link i, .tool-link svg {
   margin-right: 0.5rem;
+}
+
+/* aPaaS specific styles */
+.btn-platform-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.btn-platform-primary:hover {
+  background-color: #2a75ef;
+  border-color: #2a75ef;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .form-section {
