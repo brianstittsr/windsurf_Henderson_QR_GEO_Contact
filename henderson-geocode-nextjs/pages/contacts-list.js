@@ -33,7 +33,10 @@ export default function ContactsList() {
     setDeleting(true);
     
     try {
-      const response = await fetch(`/api/contact/${contactId}`, {
+      // Make sure the contactId includes the .json extension
+      const formattedContactId = contactId.endsWith('.json') ? contactId : `${contactId}.json`;
+      
+      const response = await fetch(`/api/contact/${formattedContactId}`, {
         method: 'DELETE',
       });
       
