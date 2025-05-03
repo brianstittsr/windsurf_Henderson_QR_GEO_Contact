@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapMarkedAlt, faMap, faPlus, faQrcode, faAddressBook, faAddressCard, faLocationDot } from '@fortawesome/free-solid-svg-icons';
+import { faMapMarkedAlt, faMap, faPlus, faQrcode, faAddressBook, faAddressCard, faLocationDot, faBuilding } from '@fortawesome/free-solid-svg-icons';
 
 export default function Layout({ children, title = 'Magnetic Lighthouse Community Development Corporation Tools Dashboard' }) {
   return (
@@ -61,6 +61,11 @@ export default function Layout({ children, title = 'Magnetic Lighthouse Communit
               <li className="nav-item">
                 <Link href="/qr-contact" className="nav-link">
                   <FontAwesomeIcon icon={faAddressCard} className="me-1" /> Add Contact
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link href="/platform" className="nav-link">
+                  <FontAwesomeIcon icon={faBuilding} className="me-1" /> Platform Dashboard
                 </Link>
               </li>
             </ul>
