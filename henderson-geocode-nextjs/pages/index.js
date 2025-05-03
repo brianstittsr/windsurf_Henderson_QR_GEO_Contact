@@ -12,7 +12,7 @@ import {
 
 export default function Home() {
   return (
-    <Layout title="Geocoding Tools Dashboard">
+    <Layout title="Magnetic Lighthouse Community Development Corporation Tools Dashboard">
       <div className="row justify-content-center">
         <div className="col-md-8">
           <h2 className="mb-4 text-center">Available Tools</h2>

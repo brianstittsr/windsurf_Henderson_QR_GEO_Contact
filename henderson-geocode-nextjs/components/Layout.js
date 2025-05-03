@@ -3,12 +3,12 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkedAlt, faMap, faPlus, faQrcode, faAddressBook, faAddressCard, faLocationDot } from '@fortawesome/free-solid-svg-icons';
 
-export default function Layout({ children, title = 'Henderson Geocode Project' }) {
+export default function Layout({ children, title = 'Magnetic Lighthouse Community Development Corporation Tools Dashboard' }) {
   return (
     <>
       <Head>
         <title>{title}</title>
-        <meta name="description" content="Henderson Geocode Project with Next.js" />
+        <meta name="description" content="Magnetic Lighthouse Community Development Corporation Tools Dashboard" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -75,7 +75,7 @@ export default function Layout({ children, title = 'Henderson Geocode Project' }
       <footer className="footer text-center">
         <div className="container">
           <p className="mb-0">
-            Henderson Geocode Project | <a href="https://developers.google.com/maps/documentation" target="_blank" rel="noopener noreferrer">Google Maps API Documentation</a>
+            Magnetic Lighthouse Community Development Corporation | <a href="https://developers.google.com/maps/documentation" target="_blank" rel="noopener noreferrer">Google Maps API Documentation</a>
           </p>
         </div>
       </footer>
