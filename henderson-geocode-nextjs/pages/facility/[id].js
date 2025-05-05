@@ -103,6 +103,22 @@ export default function FacilityDetail() {
       </Link>
       
       <div className="row">
+        {/* Facility Image Section */}
+        {facility.image && (
+          <div className="col-12 mb-4">
+            <div className="form-section">
+              <div className="text-center">
+                <img 
+                  src={facility.image} 
+                  alt={facility.facility_name || 'Facility image'} 
+                  className="img-fluid rounded" 
+                  style={{ maxHeight: '400px' }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="col-md-8">
           {/* Facility Information Section */}
           <div className="form-section">

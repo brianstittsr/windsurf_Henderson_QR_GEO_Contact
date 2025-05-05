@@ -1,8 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import { promises as fsPromises } from 'fs';
+import formidable from 'formidable';
 
 // Path to data.json file
 const dataFilePath = path.join(process.cwd(), 'public', 'data.json');
+const facilityImagesDir = path.join(process.cwd(), 'public', 'facility_images');
 
 // Helper function to read the data file
 function readDataFile() {
@@ -26,7 +29,30 @@ function writeDataFile(data) {
   fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
 }
 
-export default function handler(req, res) {
+// Disable the default body parser to handle form data with files
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+// Ensure the facility images directory exists
+if (!fs.existsSync(facilityImagesDir)) {
+  fs.mkdirSync(facilityImagesDir, { recursive: true });
+}
+
+// Parse form data including files
+const parseForm = async (req) => {
+  return new Promise((resolve, reject) => {
+    const form = new formidable.IncomingForm();
+    form.parse(req, (err, fields, files) => {
+      if (err) return reject(err);
+      resolve({ fields, files });
+    });
+  });
+};
+
+export default async function handler(req, res) {
   // Handle different HTTP methods
   switch (req.method) {
     case 'GET':
@@ -42,12 +68,33 @@ export default function handler(req, res) {
     case 'POST':
       // Add a new location
       try {
+        // Parse the form data
+        const { fields, files } = await parseForm(req);
+        
+        // Parse the JSON string back to an object
+        const newLocation = JSON.parse(fields.locationData);
+        
+        // Read existing data
         const data = readDataFile();
-        const newLocation = req.body;
         
         // Check if location already exists
         if (data.results.some(item => item.place_id === newLocation.place_id)) {
           return res.status(409).json({ error: 'Location already exists' });
+        }
+        
+        // Handle facility image if uploaded
+        if (files.facilityImage) {
+          const file = files.facilityImage;
+          const fileExt = path.extname(file.originalFilename || 'image.jpg');
+          const fileName = `${newLocation.place_id}${fileExt}`;
+          const imagePath = path.join(facilityImagesDir, fileName);
+          
+          // Read the file and save it to the facility_images directory
+          const fileData = await fsPromises.readFile(file.filepath);
+          await fsPromises.writeFile(imagePath, fileData);
+          
+          // Add image path to location data
+          newLocation.image = `/facility_images/${fileName}`;
         }
         
         // Add new location

@@ -51,6 +51,10 @@ export default function AddLocation() {
     architectInfo: ''
   });
   
+  // Image state
+  const [facilityImage, setFacilityImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  
   // UI state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -66,6 +70,21 @@ export default function AddLocation() {
       ...prev,
       [id]: value
     }));
+  };
+  
+  // Handle image upload
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFacilityImage(file);
+      
+      // Create a preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
   
   // Handle marker drag
@@ -181,13 +200,37 @@ export default function AddLocation() {
     setError('');
     
     try {
-      // Send data to API endpoint
+      // Create location data object
+      const locationData = { ...previewData };
+      
+      // Add Wikipedia info if provided
+      if (formData.buildingContext || formData.architectInfo) {
+        locationData.wikipedia_info = {};
+        
+        if (formData.buildingContext) {
+          locationData.wikipedia_info.building_context = formData.buildingContext;
+        }
+        
+        if (formData.architectInfo) {
+          locationData.wikipedia_info.architects = {
+            architect_info: formData.architectInfo
+          };
+        }
+      }
+      
+      // Create FormData for file upload
+      const formDataObj = new FormData();
+      formDataObj.append('locationData', JSON.stringify(locationData));
+      
+      // Add image if available
+      if (facilityImage) {
+        formDataObj.append('facilityImage', facilityImage);
+      }
+      
+      // Save location to API
       const response = await fetch('/api/locations', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(previewData),
+        body: formDataObj,
       });
       
       const result = await response.json();
@@ -196,29 +239,19 @@ export default function AddLocation() {
         throw new Error(result.error || 'Failed to save location');
       }
       
-      // Show success message
+      // Show success message and redirect to facility page
       setSuccess(true);
       
-      // Reset form after a delay
+      // Redirect to the facility page after a short delay
       setTimeout(() => {
-        setFormData({
-          facilityName: '',
-          category: '',
-          address: '',
-          yearBuilt: '',
-          architecturalStyle: '',
-          historicalSignificance: '',
-          currentStatus: '',
-          phone: '',
-          website: '',
-          hours: '',
-          description: '',
-          buildingContext: '',
-          architectInfo: ''
-        });
+        router.push(`/facility/${locationData.place_id}`);
+        window.scrollTo(0, 0);
+      }, 2000);
+      
+      setTimeout(() => {
+        setSuccess(false);
         setPreviewData(null);
         setMarkerPosition(null);
-        window.scrollTo(0, 0);
       }, 5000);
       
     } catch (error) {
@@ -432,6 +465,36 @@ export default function AddLocation() {
           </div>
         </div>
         
+        {/* Facility Image Section */}
+        <div className="form-section">
+          <h3>Facility Image</h3>
+          <div className="row g-3">
+            <div className="col-12">
+              <label htmlFor="facilityImage" className="form-label">Upload Facility Image</label>
+              <input 
+                type="file" 
+                className="form-control" 
+                id="facilityImage" 
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+              <div className="form-text">Upload an image of the facility (JPEG, PNG, etc.)</div>
+              
+              {imagePreview && (
+                <div className="mt-3">
+                  <p>Image Preview:</p>
+                  <img 
+                    src={imagePreview} 
+                    alt="Facility preview" 
+                    className="img-thumbnail" 
+                    style={{ maxHeight: '200px' }} 
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
         {/* Wikipedia Information Section */}
         <div className="form-section">
           <h3>Wikipedia Information</h3>
@@ -511,6 +574,17 @@ export default function AddLocation() {
                   <p className="card-text">
                     <strong>Coordinates:</strong> {previewData.geometry.location.lat.toFixed(6)}, {previewData.geometry.location.lng.toFixed(6)}
                   </p>
+                  {imagePreview && (
+                    <div className="mb-3">
+                      <p><strong>Image:</strong></p>
+                      <img 
+                        src={imagePreview} 
+                        alt="Facility preview" 
+                        className="img-thumbnail" 
+                        style={{ maxWidth: '100%' }} 
+                      />
+                    </div>
+                  )}
                   <div className="qr-code-container">
                     <QRCodeSVG 
                       value={`${window.location.origin}/facility/${previewData.place_id}`}
