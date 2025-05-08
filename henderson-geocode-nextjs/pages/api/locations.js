@@ -6,86 +6,102 @@ import formidable from 'formidable';
 // Check if running in production (Vercel)
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Path to data.json file
+// Path to data.json file for local development
 const dataFilePath = path.join(process.cwd(), 'public', 'data.json');
 const facilityImagesDir = path.join(process.cwd(), 'public', 'facility_images');
 
-// Store the request object for use in readDataFile
-let requestObj = null;
+// Hardcoded data for Vercel deployment
+// This ensures the API always has data to return even in serverless environments
+const hardcodedLocations = {
+  "results": [
+    {
+      "address_components": [
+        {
+          "long_name": "213-215",
+          "short_name": "213-215",
+          "types": ["street_number"]
+        },
+        {
+          "long_name": "South Garnett Street",
+          "short_name": "S Garnett St",
+          "types": ["route"]
+        },
+        {
+          "long_name": "Henderson",
+          "short_name": "Henderson",
+          "types": ["locality", "political"]
+        },
+        {
+          "long_name": "Vance County",
+          "short_name": "Vance County",
+          "types": ["administrative_area_level_2", "political"]
+        },
+        {
+          "long_name": "North Carolina",
+          "short_name": "NC",
+          "types": ["administrative_area_level_1", "political"]
+        },
+        {
+          "long_name": "United States",
+          "short_name": "US",
+          "types": ["country", "political"]
+        },
+        {
+          "long_name": "27536",
+          "short_name": "27536",
+          "types": ["postal_code"]
+        }
+      ],
+      "formatted_address": "213-215 S Garnett St, Henderson, NC 27536, USA",
+      "geometry": {
+        "location": {
+          "lat": 36.326337,
+          "lng": -78.403765
+        },
+        "location_type": "ROOFTOP",
+        "viewport": {
+          "northeast": {
+            "lat": 36.3276859,
+            "lng": -78.4024160
+          },
+          "southwest": {
+            "lat": 36.3249881,
+            "lng": -78.4051139
+          }
+        }
+      },
+      "facility_name": "First National Bank Building",
+      "place_id": "ChIJN87riHCFreIRb8VKl5u7KAs",
+      "plus_code": {
+        "compound_code": "QH3Q+G6 Henderson, NC, USA",
+        "global_code": "87B4QH3Q+G6"
+      }
+    }
+  ]
+};
 
 // Helper function to read the data file
 async function readDataFile() {
   if (isProduction) {
-    // In production (Vercel), fetch the data.json file from the public URL
-    try {
-      // Construct the URL based on Vercel's environment
-      let baseUrl;
-      
-      if (process.env.VERCEL_URL) {
-        // Use Vercel's deployment URL
-        baseUrl = `https://${process.env.VERCEL_URL}`;
-      } else if (requestObj?.headers?.host) {
-        // Fallback to request host if available
-        baseUrl = `https://${requestObj.headers.host}`;
-      } else {
-        // Final fallback - this should be replaced with your actual Vercel domain
-        baseUrl = 'https://henderson-geocode-nextjs.vercel.app';
-      }
-      
-      console.log(`Fetching data.json from ${baseUrl}/data.json`);
-      const response = await fetch(`${baseUrl}/data.json`);
-      
-      if (!response.ok) {
-        console.error(`Failed to fetch data.json: ${response.status}`);
-        // Return fallback data if fetch fails
-        return {
-          "results": [
-            {
-              "formatted_address": "213-215 S Garnett St, Henderson, NC 27536, USA",
-              "geometry": {
-                "location": {
-                  "lat": 36.326337,
-                  "lng": -78.403765
-                }
-              },
-              "facility_name": "First National Bank Building",
-              "place_id": "ChIJN87riHCFreIRb8VKl5u7KAs"
-            }
-          ]
-        };
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching data.json:', error);
-      // Return fallback data on error
-      return {
-        "results": [
-          {
-            "formatted_address": "213-215 S Garnett St, Henderson, NC 27536, USA",
-            "geometry": {
-              "location": {
-                "lat": 36.326337,
-                "lng": -78.403765
-              }
-            },
-            "facility_name": "First National Bank Building",
-            "place_id": "ChIJN87riHCFreIRb8VKl5u7KAs"
-          }
-        ]
-      };
-    }
+    // In production (Vercel), return the hardcoded data
+    console.log('Using hardcoded data for Vercel deployment');
+    return hardcodedLocations;
   } else {
     // In development, read from the filesystem
-    if (!fs.existsSync(dataFilePath)) {
-      // Create default structure if file doesn't exist
-      const defaultData = { results: [] };
-      fs.writeFileSync(dataFilePath, JSON.stringify(defaultData, null, 2));
-      return defaultData;
+    try {
+      if (!fs.existsSync(dataFilePath)) {
+        // Create default structure if file doesn't exist
+        const defaultData = { results: [] };
+        fs.writeFileSync(dataFilePath, JSON.stringify(defaultData, null, 2));
+        return defaultData;
+      }
+      
+      const fileData = fs.readFileSync(dataFilePath, 'utf8');
+      return JSON.parse(fileData);
+    } catch (error) {
+      console.error('Error reading data file:', error);
+      return hardcodedLocations; // Fallback to hardcoded data
     }
-    
-    const fileData = fs.readFileSync(dataFilePath, 'utf8');
-    return JSON.parse(fileData);
   }
 }
 
@@ -122,9 +138,6 @@ const parseForm = async (req) => {
 };
 
 export default async function handler(req, res) {
-  // Store the request object for use in readDataFile
-  requestObj = req;
-  
   // Handle different HTTP methods
   switch (req.method) {
     case 'GET':
