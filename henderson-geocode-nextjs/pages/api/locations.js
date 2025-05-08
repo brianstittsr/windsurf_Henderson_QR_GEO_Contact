@@ -3,21 +3,47 @@ import path from 'path';
 import { promises as fsPromises } from 'fs';
 import formidable from 'formidable';
 
+// Check if running in production (Vercel)
+const isProduction = process.env.NODE_ENV === 'production';
+
 // Path to data.json file
 const dataFilePath = path.join(process.cwd(), 'public', 'data.json');
 const facilityImagesDir = path.join(process.cwd(), 'public', 'facility_images');
 
 // Helper function to read the data file
-function readDataFile() {
-  if (!fs.existsSync(dataFilePath)) {
-    // Create default structure if file doesn't exist
-    const defaultData = { results: [] };
-    fs.writeFileSync(dataFilePath, JSON.stringify(defaultData, null, 2));
-    return defaultData;
+async function readDataFile() {
+  if (isProduction) {
+    // In production (Vercel), fetch the data.json file from the public URL
+    try {
+      // Get the host from the environment or use a fallback
+      const host = process.env.VERCEL_URL || global.vercelHost || 'localhost:3000';
+      const protocol = host.includes('localhost') ? 'http' : 'https';
+      
+      console.log(`Fetching data.json from ${protocol}://${host}/data.json`);
+      const response = await fetch(`${protocol}://${host}/data.json`);
+      
+      if (!response.ok) {
+        console.error(`Failed to fetch data.json: ${response.status}`);
+        return { results: [] }; // Return empty data if fetch fails
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching data.json:', error);
+      return { results: [] }; // Return empty data on error
+    }
+  } else {
+    // In development, read from the filesystem
+    if (!fs.existsSync(dataFilePath)) {
+      // Create default structure if file doesn't exist
+      const defaultData = { results: [] };
+      fs.writeFileSync(dataFilePath, JSON.stringify(defaultData, null, 2));
+      return defaultData;
+    }
+    
+    const fileData = fs.readFileSync(dataFilePath, 'utf8');
+    return JSON.parse(fileData);
   }
-  
-  const fileData = fs.readFileSync(dataFilePath, 'utf8');
-  return JSON.parse(fileData);
 }
 
 // Helper function to write to the data file
@@ -53,14 +79,20 @@ const parseForm = async (req) => {
 };
 
 export default async function handler(req, res) {
+  // Store the host for use in readDataFile when in production
+  if (isProduction && req.headers && req.headers.host) {
+    global.vercelHost = req.headers.host;
+  }
+  
   // Handle different HTTP methods
   switch (req.method) {
     case 'GET':
       // Return all locations
       try {
-        const data = readDataFile();
+        const data = await readDataFile();
         res.status(200).json(data);
       } catch (error) {
+        console.error('Error in GET handler:', error);
         res.status(500).json({ error: 'Failed to fetch locations' });
       }
       break;
@@ -75,7 +107,7 @@ export default async function handler(req, res) {
         const newLocation = JSON.parse(fields.locationData);
         
         // Read existing data
-        const data = readDataFile();
+        const data = await readDataFile();
         
         // Check if location already exists
         if (data.results.some(item => item.place_id === newLocation.place_id)) {
