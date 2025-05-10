@@ -1,0 +1,99 @@
+{
+    "results": [
+      {
+        "address_components": [
+          {
+            "long_name": "213-215",
+            "short_name": "213-215",
+            "types": ["street_number"]
+          },
+          {
+            "long_name": "South Garnett Street",
+            "short_name": "S Garnett St",
+            "types": ["route"]
+          },
+          {
+            "long_name": "Henderson",
+            "short_name": "Henderson",
+            "types": ["locality", "political"]
+          },
+          {
+            "long_name": "Vance County",
+            "short_name": "Vance County",
+            "types": ["administrative_area_level_2", "political"]
+          },
+          {
+            "long_name": "North Carolina",
+            "short_name": "NC",
+            "types": ["administrative_area_level_1", "political"]
+          },
+          {
+            "long_name": "United States",
+            "short_name": "US",
+            "types": ["country", "political"]
+          },
+          {
+            "long_name": "27536",
+            "short_name": "27536",
+            "types": ["postal_code"]
+          }
+        ],
+        "formatted_address": "213-215 S Garnett St, Henderson, NC 27536, USA",
+        "geometry": {
+          "location": {
+            "lat": 36.326337,
+            "lng": -78.403765
+          },
+          "location_type": "ROOFTOP",
+          "viewport": {
+            "northeast": {
+              "lat": 36.3276859,
+              "lng": -78.4024160
+            },
+            "southwest": {
+              "lat": 36.3249881,
+              "lng": -78.4051139
+            }
+          }
+        },
+        "facility_name": "First National Bank Building",
+        "place_id": "ChIJN87riHCFreIRb8VKl5u7KAs",
+        "plus_code": {
+          "compound_code": "QH3Q+G6 Henderson, NC, USA",
+          "global_code": "87B4QH3Q+G6"
+        },
+        "types": ["bank", "establishment", "point_of_interest", "finance", "historic"],
+        "historical_info": {
+          "year_built": 1921,
+          "architectural_style": "Beaux Arts Neoclassical",
+          "architects": [
+            {
+              "name": "Frank Pierce Milburn",
+              "lifespan": "1868-1926",
+              "firm": "Milburn, Heister, and Company"
+            },
+            {
+              "name": "Michael Heister",
+              "lifespan": "1870-1948",
+              "role": "Chief Designer"
+            }
+          ],
+          "historical_significance": "Historic bank building designed by prominent southern architects Milburn and Heister, who designed over 250 major buildings throughout the southeastern United States",
+          "current_status": "Standing historic structure",
+          "listed_in_inventories": ["An Inventory of Historic Architecture, Henderson, North Carolina (1979)"],
+          "recent_developments": {
+            "date": "December 2024",
+            "note": "Considered for potential use as a train station and mobility hub for the S-Line project by Henderson City Council"
+          }
+        },
+        "wikipedia_info": {
+          "architects": {
+            "frank_milburn": "Frank Pierce Milburn (1868-1926) was a prolific American architect who designed numerous railroad stations, courthouses, and commercial buildings throughout the southeastern United States. He pioneered new approaches to architectural marketing and established one of the first regional architectural practices in the South.",
+            "milburn_heister_company": "Established in 1909 when Milburn partnered with Michael Heister, the firm became one of the most successful architectural firms in Washington, D.C. Heister served as the principal designer while Milburn focused on business operations."
+          },
+          "building_context": "This building represents the significant commercial architecture of the early 20th century in North Carolina and is part of the architectural legacy of the Milburn and Heister firm, whose work includes numerous historically significant buildings across the South."
+        }
+      }
+    ],
+    "status": "OK"
+  }

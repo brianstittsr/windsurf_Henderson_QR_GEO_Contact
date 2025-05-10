@@ -6,7 +6,8 @@ import {
   faArrowLeft, 
   faInfoCircle, 
   faDownload, 
-  faExternalLinkAlt 
+  faExternalLinkAlt,
+  faTrash 
 } from '@fortawesome/free-solid-svg-icons';
 import { QRCodeSVG } from 'qrcode.react';
 
@@ -76,6 +77,29 @@ export default function QRCodesPage() {
     img.src = url;
   };
   
+  // Function to handle deleting a location
+  const handleDelete = async (placeId, facilityName) => {
+    if (window.confirm(`Are you sure you want to delete ${facilityName}? This action cannot be undone.`)) {
+      try {
+        const response = await fetch(`/api/locations?place_id=${placeId}`, {
+          method: 'DELETE',
+        });
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          alert(`${facilityName} has been deleted successfully.`);
+          // Update the local state to reflect the deletion
+          setLocations(prevLocations => prevLocations.filter(loc => loc.place_id !== placeId));
+        } else {
+          alert(`Failed to delete ${facilityName}: ${result.error || 'Unknown error'}`);
+        }
+      } catch (err) {
+        console.error('Error deleting location:', err);
+        alert(`An error occurred while deleting ${facilityName}. See console for details.`);
+      }
+    }
+  };
+
   return (
     <Layout title="Henderson QR Codes">
       <Link href="/" className="back-link">
@@ -146,6 +170,12 @@ export default function QRCodesPage() {
                         onClick={() => downloadQRCode(location.place_id.replace(/[^a-zA-Z0-9]/g, ''), facilityName)}
                       >
                         <FontAwesomeIcon icon={faDownload} className="me-1" /> Download QR
+                      </button>
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => handleDelete(location.place_id, facilityName)}
+                      >
+                        <FontAwesomeIcon icon={faTrash} className="me-1" /> Delete
                       </button>
                     </div>
                   </div>
