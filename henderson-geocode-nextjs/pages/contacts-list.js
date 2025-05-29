@@ -24,35 +24,57 @@ export default function ContactsList() {
   const [duplicating, setDuplicating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
-  // Function to delete a contact
-  const deleteContact = async (contactId) => {
-    if (!confirm('Are you sure you want to delete this contact? This action cannot be undone.')) {
-      return;
-    }
-    
+  // New state for delete confirmation modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState(null);
+
+  // Function to trigger the actual deletion process
+  const performActualDelete = async (contactFilename) => {
+    if (!contactFilename) return;
+
     setDeleting(true);
-    
     try {
-      // Make sure the contactId includes the .json extension
-      const formattedContactId = contactId.endsWith('.json') ? contactId : `${contactId}.json`;
-      
+      // Optimistically remove the contact from the UI
+      setContacts(prevContacts => prevContacts.filter(contact => contact.filename !== contactFilename));
+
+      const formattedContactId = contactFilename.endsWith('.json') ? contactFilename : `${contactFilename}.json`;
       const response = await fetch(`/api/contact/${formattedContactId}`, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to delete contact');
+        // If delete failed, try to re-fetch to revert optimistic update or show server error
+        fetchContacts(); // Re-fetch to get the actual state
+        const errorData = await response.json().catch(() => ({ message: 'Failed to delete contact and parse error response.' }));
+        throw new Error(errorData.message || 'Failed to delete contact from server.');
       }
-      
-      // Refresh the contacts list
-      fetchContacts();
-      
+      // Optionally, call fetchContacts() again if you want to be absolutely sure, 
+      // but optimistic update + specific error handling is often preferred.
+      // fetchContacts(); 
+
     } catch (err) {
       console.error('Error deleting contact:', err);
       alert(`Error: ${err.message}`);
+      // If an error occurred, and optimistic update happened, 
+      // re-fetching contacts is important to revert UI to consistent state.
+      fetchContacts(); 
     } finally {
       setDeleting(false);
+      setShowDeleteModal(false); // Close modal
+      setContactToDelete(null);  // Reset contact to delete
     }
+  };
+
+  // Function to open the delete confirmation modal
+  const handleDeleteClick = (contact) => {
+    setContactToDelete(contact); // Store the whole contact object
+    setShowDeleteModal(true);
+  };
+
+  // Function to close the delete confirmation modal
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setContactToDelete(null);
   };
 
   // Function to fetch contacts
@@ -72,7 +94,7 @@ export default function ContactsList() {
       setLoading(false);
     }
   }
-  
+
   // Function to open the duplicate modal
   const openDuplicateModal = (contact) => {
     setDuplicateData({
@@ -87,7 +109,7 @@ export default function ContactsList() {
     setShowDuplicateModal(true);
     setShowPreview(false);
   };
-  
+
   // Function to handle profile image upload
   const handleProfileImageChange = (e) => {
     const file = e.target.files[0];
@@ -103,7 +125,7 @@ export default function ContactsList() {
       reader.readAsDataURL(file);
     }
   };
-  
+
   // Function to handle input changes in the duplicate form
   const handleDuplicateInputChange = (e) => {
     const { id, value } = e.target;
@@ -112,7 +134,7 @@ export default function ContactsList() {
       [id]: value
     }));
   };
-  
+
   // Function to preview the duplicated contact
   const previewDuplicatedContact = () => {
     // Validate required fields
@@ -120,10 +142,10 @@ export default function ContactsList() {
       alert('Please fill in all required fields (First Name, Last Name, Phone, and Email)');
       return;
     }
-    
+
     setShowPreview(true);
   };
-  
+
   // Function to save the duplicated contact
   const saveDuplicatedContact = async () => {
     // Validate required fields
@@ -131,9 +153,9 @@ export default function ContactsList() {
       alert('Please fill in all required fields (First Name, Last Name, Phone, and Email)');
       return;
     }
-    
+
     setDuplicating(true);
-    
+
     try {
       // Create a new contact object based on the original contact
       const newContact = {
@@ -145,14 +167,14 @@ export default function ContactsList() {
         // Don't set profileImage here, let the API handle it
         profileImage: null
       };
-      
+
       // Remove any properties that might cause issues
       delete newContact.id;
       delete newContact.qrCode;
-      
+
       // Generate filename for the new contact
       const filename = `${duplicateData.firstName.toLowerCase()}_${duplicateData.lastName.toLowerCase()}.json`;
-      
+
       // Send the new contact to the API
       const response = await fetch('/api/contacts', {
         method: 'POST',
@@ -165,19 +187,19 @@ export default function ContactsList() {
           profileImage: duplicateData.profileImagePreview
         }),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to save duplicated contact');
       }
-      
+
       // Close the modal and refresh contacts
       setShowDuplicateModal(false);
       setShowPreview(false);
       fetchContacts();
-      
+
       // Show success message
       alert(`Contact for ${duplicateData.firstName} ${duplicateData.lastName} has been created successfully!`);
-      
+
     } catch (err) {
       console.error('Error saving duplicated contact:', err);
       alert(`Error: ${err.message}`);
@@ -337,7 +359,7 @@ export default function ContactsList() {
                     </button>
                     <button 
                       className="btn btn-sm btn-danger"
-                      onClick={() => deleteContact(`${contact.firstName.toLowerCase()}_${contact.lastName.toLowerCase()}`)}
+                      onClick={() => handleDeleteClick(contact)} // Changed to open modal
                       disabled={deleting}
                     >
                       <i className="fas fa-trash-alt me-1"></i> Delete
@@ -555,6 +577,47 @@ export default function ContactsList() {
             </div>
           </div>
         </div>
+      )}
+      
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && contactToDelete && (
+        <>
+          <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" role="dialog">
+            <div className="modal-dialog modal-dialog-centered" role="document">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Confirm Deletion</h5>
+                  <button type="button" className="btn-close" onClick={handleCloseDeleteModal} aria-label="Close" disabled={deleting}></button>
+                </div>
+                <div className="modal-body">
+                  <p>Are you sure you want to delete the contact for <strong>{contactToDelete.firstName} {contactToDelete.lastName}</strong>?</p>
+                  <p>This action cannot be undone.</p>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseDeleteModal} disabled={deleting}>
+                    Cancel
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn btn-danger" 
+                    onClick={() => performActualDelete(contactToDelete.filename)} 
+                    disabled={deleting}
+                  >
+                    {deleting ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Deleting...
+                      </>
+                    ) : (
+                      'Delete Contact'
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop fade show"></div>
+        </>
       )}
     </Layout>
   );

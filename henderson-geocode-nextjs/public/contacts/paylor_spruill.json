@@ -1,0 +1,21 @@
+{
+  "firstName": "Paylor",
+  "lastName": "Spruill",
+  "email": "GarySpruill@henderson.nc.gov",
+  "phone": "252-430-5703",
+  "company": "City of Henderson",
+  "jobTitle": "Assistant City Manager",
+  "workAddress": "",
+  "workPhone": "252-430-5703",
+  "workEmail": "GarySpruill@henderson.nc.gov",
+  "website": "",
+  "birthday": "",
+  "notes": "",
+  "linkedin": "",
+  "twitter": "",
+  "facebook": "",
+  "instagram": "",
+  "id": "1747928066814",
+  "vcard": "BEGIN:VCARD\nVERSION:3.0\nN:Spruill;Paylor;;;\nFN:Paylor Spruill\nORG:City of Henderson\nTITLE:Assistant City Manager\nEMAIL;type=INTERNET;type=HOME:GarySpruill@henderson.nc.gov\nTEL;type=CELL:252-430-5703\nTEL;type=WORK:252-430-5703\nEND:VCARD",
+  "profileImage": "1747928066881_paylor_spruill.jpg"
+}

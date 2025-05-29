@@ -1,0 +1,21 @@
+{
+  "firstName": "Timothy",
+  "lastName": "Jackson III",
+  "email": "timothy.jackson@durhamnc.gov",
+  "phone": "919-560-4180",
+  "company": "",
+  "jobTitle": "",
+  "workAddress": "",
+  "workPhone": "919-560-4180",
+  "workEmail": "timothy.jackson@durhamnc.gov",
+  "website": "https://www.durhamnc.gov",
+  "birthday": "",
+  "notes": "",
+  "linkedin": "",
+  "twitter": "",
+  "facebook": "",
+  "instagram": "",
+  "id": "1748027365760",
+  "vcard": "BEGIN:VCARD\nVERSION:3.0\nN:Jackson III;Timothy;;;\nFN:Timothy Jackson III\nEMAIL;type=INTERNET;type=HOME:timothy.jackson@durhamnc.gov\nTEL;type=CELL:919-560-4180\nTEL;type=WORK:919-560-4180\nURL:https://www.durhamnc.gov\nEND:VCARD",
+  "profileImage": "1748027365847_timothy_jackson iii.jpg"
+}

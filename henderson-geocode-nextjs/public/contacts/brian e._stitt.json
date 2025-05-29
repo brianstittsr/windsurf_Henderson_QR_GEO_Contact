@@ -1,0 +1,21 @@
+{
+  "firstName": "Brian E.",
+  "lastName": "Stitt",
+  "email": "bstitt@my.waketech.edu",
+  "phone": "919-608-3415",
+  "company": "Wake Tech Community College",
+  "jobTitle": "Collaborative Robotics and Advanced Manufacturing Instructor",
+  "workAddress": "",
+  "workPhone": "919-608-3415",
+  "workEmail": "bstitt@my.waketech.edu",
+  "website": "https://www.waketech.edu",
+  "birthday": "",
+  "notes": "",
+  "linkedin": "",
+  "twitter": "",
+  "facebook": "",
+  "instagram": "",
+  "id": "1747282238359",
+  "vcard": "BEGIN:VCARD\nVERSION:3.0\nN:Stitt;Brian E.;;;\nFN:Brian E. Stitt\nORG:Wake Tech Community College\nTITLE:Collaborative Robotics and Advanced Manufacturing Instructor\nEMAIL;type=INTERNET;type=HOME:bstitt@my.waketech.edu\nTEL;type=CELL:919-608-3415\nTEL;type=WORK:919-608-3415\nURL;type=WORK:https://www.waketech.edu\nEND:VCARD",
+  "profileImage": null
+}

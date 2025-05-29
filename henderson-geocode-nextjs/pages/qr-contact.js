@@ -31,8 +31,18 @@ export default function QRContact() {
     instagram: ''
   });
   const [vcard, setVcard] = useState('');
+  const [savedProfilesList, setSavedProfilesList] = useState([]);
   const formRef = useRef(null);
   const qrRef = useRef(null);
+
+  // Load saved profiles from localStorage on component mount and after a successful save
+  useEffect(() => {
+    const loadProfiles = () => {
+      const profiles = JSON.parse(localStorage.getItem('savedContactProfiles')) || [];
+      setSavedProfilesList(profiles);
+    };
+    loadProfiles();
+  }, [success]); // Reload when a new contact is successfully saved
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -100,7 +110,11 @@ export default function QRContact() {
     }
     
     if (data.website) {
-      vcard += `URL:${data.website}\n`;
+      if (data.company) {
+        vcard += `URL;type=WORK:${data.website}\n`;
+      } else {
+        vcard += `URL:${data.website}\n`;
+      }
     }
     
     if (data.birthday) {
@@ -208,119 +222,77 @@ export default function QRContact() {
   // Save contact
   const saveContact = async (e) => {
     e.preventDefault();
-    
-    // Check if preview has been generated
-    if (!vcard) {
-      alert('Please preview the contact before saving');
-      return;
-    }
-    
-    // Show loading spinner
     setLoading(true);
-    
+    setSuccess(false);
+    setShowPreview(false); // Hide preview after attempting to save
+
+    const currentVcard = generateVCard(contactData);
+    setVcard(currentVcard); // Ensure vcard is set for potential immediate re-preview or other uses
+
+    const contactDetailsToSave = {
+      ...contactData,
+      id: Date.now().toString(), // Add a unique ID
+      vcard: currentVcard,
+      profileImage: profileImage // Store the base64 image string
+    };
+
     try {
-      // Get QR code as base64
-      let qrCodeBase64 = '';
-      if (qrRef.current) {
-        // Convert SVG to canvas and then to base64
-        const svgElement = qrRef.current.querySelector('svg');
-        const svgData = new XMLSerializer().serializeToString(svgElement);
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = new Image();
-        
-        // Set canvas dimensions to match SVG
-        canvas.width = svgElement.width.baseVal.value;
-        canvas.height = svgElement.height.baseVal.value;
-        
-        // Create a data URL from the SVG
-        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-        const url = URL.createObjectURL(svgBlob);
-        
-        // Wait for the image to load
-        await new Promise((resolve) => {
-          img.onload = resolve;
-          img.src = url;
-        });
-        
-        // Draw the image on the canvas
-        ctx.drawImage(img, 0, 0);
-        qrCodeBase64 = canvas.toDataURL('image/png');
-        URL.revokeObjectURL(url);
-      }
+      // Save to localStorage first (this will still work even if the API call fails)
+      const existingProfiles = JSON.parse(localStorage.getItem('savedContactProfiles')) || [];
+      const updatedProfiles = [...existingProfiles, contactDetailsToSave];
+      localStorage.setItem('savedContactProfiles', JSON.stringify(updatedProfiles));
       
-      // Create contact data object
-      const contact = {
-        ...contactData,
-        createdAt: new Date().toISOString(),
-        qrCode: qrCodeBase64
-      };
-      
-      // Add profile image if available
-      if (profileImage) {
-        contact.profileImage = `${contact.firstName.toLowerCase()}_${contact.lastName.toLowerCase()}.jpg`;
-      }
-      
-      // Create filename
-      const filename = `${contact.firstName.toLowerCase()}_${contact.lastName.toLowerCase()}.json`;
-      
-      // Send data to API
+      // Now save to the server via API
       const response = await fetch('/api/contacts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          contact: contact,
-          filename: filename,
+          contact: contactDetailsToSave,
+          filename: `${contactData.firstName.toLowerCase()}_${contactData.lastName.toLowerCase()}.json`,
           profileImage: profileImage
         }),
       });
       
       if (!response.ok) {
-        throw new Error('Failed to save contact');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save contact to server');
       }
       
-      // Show success message
-      setSuccessMessage(`Contact for ${contact.firstName} ${contact.lastName} saved successfully!`);
+      setSuccessMessage('Contact profile saved successfully to local storage and server!');
       setSuccess(true);
       
-      // Reset form after a delay
-      setTimeout(() => {
-        formRef.current.reset();
-        setContactData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          company: '',
-          jobTitle: '',
-          workAddress: '',
-          workPhone: '',
-          workEmail: '',
-          website: '',
-          birthday: '',
-          notes: '',
-          linkedin: '',
-          twitter: '',
-          facebook: '',
-          instagram: ''
-        });
-        setShowPreview(false);
-        setProfileImage(null);
-        setProfileImagePreview(null);
-        setVcard('');
-        setSuccess(false);
-        
-        // Redirect to contacts list
-        router.push('/contacts-list');
-      }, 3000);
-      
+      // Optionally clear the form after successful save
+      // formRef.current.reset();
+      // setContactData({ ...initialContactDataState... }); 
+      // setProfileImagePreview(null);
+      // setProfileImage(null);
     } catch (error) {
       console.error('Error saving contact:', error);
-      alert(`Error: ${error.message}`);
-    } finally {
-      setLoading(false);
+      setSuccessMessage(`Error: ${error.message}. Contact saved to localStorage only.`);
+      setSuccess(false);
+    }
+
+    setLoading(false);
+    // setTimeout(() => setSuccess(false), 5000); // Hide success message after 5s
+  };
+
+  const handleDeleteProfile = (profileId) => {
+    if (window.confirm('Are you sure you want to delete this contact profile?')) {
+      try {
+        const updatedProfiles = savedProfilesList.filter(profile => profile.id !== profileId);
+        localStorage.setItem('savedContactProfiles', JSON.stringify(updatedProfiles));
+        setSavedProfilesList(updatedProfiles);
+        // alert('Contact profile deleted successfully.');
+
+        // If you have a backend API for deletion, call it here
+        // await fetch(`/api/save-contact-profile/${profileId}`, { method: 'DELETE' });
+
+      } catch (error) {
+        console.error('Failed to delete contact profile:', error);
+        alert('Failed to delete contact profile.');
+      }
     }
   };
 
@@ -714,6 +686,33 @@ export default function QRContact() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Display Saved Contact Profiles */}
+        {savedProfilesList.length > 0 && (
+          <div id="savedProfilesSection" className="card mt-4">
+            <div className="card-header bg-info text-white">
+              <h3 className="mb-0">Saved Contact Profiles</h3>
+            </div>
+            <div className="card-body">
+              <ul className="list-group">
+                {savedProfilesList.map((profile) => (
+                  <li key={profile.id} className="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                      <strong>{profile.firstName} {profile.lastName}</strong>
+                      {profile.company && <span className="d-block text-muted">{profile.company}</span>}
+                    </div>
+                    <button 
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDeleteProfile(profile.id)}
+                    >
+                      <i className="fas fa-trash-alt"></i> Delete
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         )}

@@ -1,0 +1,21 @@
+{
+  "firstName": "Bo",
+  "lastName": "Ferguson",
+  "email": "Bo.Ferguson@durhamnc.gov",
+  "phone": "919-813-6315",
+  "company": "City of Durham",
+  "jobTitle": "City Manager",
+  "workAddress": "",
+  "workPhone": "919-813-6315",
+  "workEmail": "Bo.Ferguson@durhamnc.gov",
+  "website": "https://www.durhamnc.gov/",
+  "birthday": "",
+  "notes": "",
+  "linkedin": "",
+  "twitter": "",
+  "facebook": "",
+  "instagram": "",
+  "id": "1748029486399",
+  "vcard": "BEGIN:VCARD\nVERSION:3.0\nN:Ferguson;Bo;;;\nFN:Bo Ferguson\nORG:City of Durham\nTITLE:City Manager\nEMAIL;type=INTERNET;type=HOME:Bo.Ferguson@durhamnc.gov\nTEL;type=CELL:919-813-6315\nTEL;type=WORK:919-813-6315\nURL;type=WORK:https://www.durhamnc.gov/\nEND:VCARD",
+  "profileImage": "1748029486474_bo_ferguson.jpg"
+}

@@ -1,0 +1,21 @@
+{
+  "firstName": "Brian",
+  "lastName": "Stitt",
+  "email": "brians@wl4wj.org",
+  "phone": "919-608-3415",
+  "company": "Women Leading for Wellness and Justice",
+  "jobTitle": "Director of Communications",
+  "workAddress": "",
+  "workPhone": "919-444-2864 x102",
+  "workEmail": "brians@wl4wj.org",
+  "website": "https://www.womenleading.org",
+  "birthday": "",
+  "notes": "",
+  "linkedin": "",
+  "twitter": "",
+  "facebook": "",
+  "instagram": "",
+  "id": "1747281589753",
+  "vcard": "BEGIN:VCARD\nVERSION:3.0\nN:Stitt;Brian;;;\nFN:Brian Stitt\nORG:Women Leading for Wellness and Justice\nTITLE:Director of Communications\nEMAIL;type=INTERNET;type=HOME:brians@wl4wj.org\nTEL;type=CELL:919-608-3415\nTEL;type=WORK:919-444-2864 x102\nURL;type=WORK:https://www.womenleading.org\nEND:VCARD",
+  "profileImage": "1747281589851_brian_stitt.jpg"
+}

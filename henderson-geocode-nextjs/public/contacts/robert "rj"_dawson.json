@@ -1,0 +1,21 @@
+{
+  "firstName": "Robert \"RJ\"",
+  "lastName": "Dawson",
+  "email": "bobbydawsonjr@gmail.com",
+  "phone": "‭+1 (919) 423-4966‬",
+  "company": "",
+  "jobTitle": "",
+  "workAddress": "",
+  "workPhone": "‭+1 (919) 423-4966‬",
+  "workEmail": "bobbydawsonjr@gmail.com",
+  "website": "",
+  "birthday": "",
+  "notes": "",
+  "linkedin": "",
+  "twitter": "",
+  "facebook": "",
+  "instagram": "",
+  "id": "1748302969656",
+  "vcard": "BEGIN:VCARD\nVERSION:3.0\nN:Dawson;Robert \"RJ\";;;\nFN:Robert \"RJ\" Dawson\nEMAIL;type=INTERNET;type=HOME:bobbydawsonjr@gmail.com\nTEL;type=CELL:‭+1 (919) 423-4966‬\nTEL;type=WORK:‭+1 (919) 423-4966‬\nEND:VCARD",
+  "profileImage": "1748302969729_robert \"rj\"_dawson.jpg"
+}

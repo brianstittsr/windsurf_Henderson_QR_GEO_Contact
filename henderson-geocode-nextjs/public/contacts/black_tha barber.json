@@ -1,0 +1,21 @@
+{
+  "firstName": "Black",
+  "lastName": "Tha Barber",
+  "email": "black@blackthabarber.com",
+  "phone": "919-702-3370",
+  "company": "Diamond Cutz Barbershop",
+  "jobTitle": "Tha Barber",
+  "workAddress": "1350 5th Ave",
+  "workPhone": "919-702-3370",
+  "workEmail": "black@blackthabarber.com",
+  "website": "",
+  "birthday": "",
+  "notes": "",
+  "linkedin": "",
+  "twitter": "",
+  "facebook": "",
+  "instagram": "",
+  "id": "1748100834959",
+  "vcard": "BEGIN:VCARD\nVERSION:3.0\nN:Tha Barber;Black;;;\nFN:Black Tha Barber\nORG:Diamond Cutz Barbershop\nTITLE:Tha Barber\nEMAIL;type=INTERNET;type=HOME:black@blackthabarber.com\nTEL;type=CELL:919-702-3370\nTEL;type=WORK:919-702-3370\nADR;type=WORK:;;1350 5th Ave;;;;\nEND:VCARD",
+  "profileImage": "1748100834995_black_tha barber.jpg"
+}

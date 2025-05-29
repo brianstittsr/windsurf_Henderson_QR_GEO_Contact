@@ -1,0 +1,21 @@
+{
+  "firstName": "Carla",
+  "lastName": "Harris",
+  "email": "carharris67@gmail.com",
+  "phone": "910-890-2806",
+  "company": "Women Leading for Wellness for Justice",
+  "jobTitle": "Community Health Worker (CHW)",
+  "workAddress": "",
+  "workPhone": "910-890-2806",
+  "workEmail": "carharris67@gmail.com",
+  "website": "https://www.womenleading.org",
+  "birthday": "",
+  "notes": "",
+  "linkedin": "",
+  "twitter": "",
+  "facebook": "",
+  "instagram": "",
+  "id": "1747496697714",
+  "vcard": "BEGIN:VCARD\nVERSION:3.0\nN:Harris;Carla;;;\nFN:Carla Harris\nORG:Women Leading for Wellness for Justice\nTITLE:Community Health Worker (CHW)\nEMAIL;type=INTERNET;type=HOME:carharris67@gmail.com\nTEL;type=CELL:910-890-2806\nTEL;type=WORK:910-890-2806\nURL;type=WORK:https://www.womenleading.org\nEND:VCARD",
+  "profileImage": null
+}
